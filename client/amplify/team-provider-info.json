@@ -1,0 +1,31 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-rideshare-staging-183518-authRole",
+      "UnauthRoleArn": "arn:aws:iam::229810940876:role/amplify-rideshare-staging-183518-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::229810940876:role/amplify-rideshare-staging-183518-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-rideshare-staging-183518-deployment",
+      "UnauthRoleName": "amplify-rideshare-staging-183518-unauthRole",
+      "StackName": "amplify-rideshare-staging-183518",
+      "StackId": "arn:aws:cloudformation:eu-north-1:229810940876:stack/amplify-rideshare-staging-183518/6286bb50-8bc1-11ee-968a-069703206110",
+      "AmplifyAppId": "d1k2faw1ro6par"
+    },
+    "categories": {
+      "auth": {
+        "rscabtest2": {
+          "nativeClientId": "5k11v1ou6j1qr78kq0fqb7o5p3",
+          "userPoolId": "eu-north-1_4nKBm934a",
+          "userPoolName": "rscab",
+          "webClientId": "5k11v1ou6j1qr78kq0fqb7o5p3"
+        },
+        "rideshare": {
+          "nativeClientId": "7pcac91a98up4iqpbal7mgb47",
+          "userPoolId": "eu-north-1_FEES6hS0P",
+          "userPoolName": "rscab",
+          "webClientId": "7pcac91a98up4iqpbal7mgb47"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-rideshare-staging-183518-authRole",
+      "UnauthRoleArn": "arn:aws:iam::229810940876:role/amplify-rideshare-staging-183518-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::229810940876:role/amplify-rideshare-staging-183518-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-rideshare-staging-183518-deployment",
+      "UnauthRoleName": "amplify-rideshare-staging-183518-unauthRole",
+      "StackName": "amplify-rideshare-staging-183518",
+      "StackId": "arn:aws:cloudformation:eu-north-1:229810940876:stack/amplify-rideshare-staging-183518/6286bb50-8bc1-11ee-968a-069703206110",
+      "AmplifyAppId": "d1k2faw1ro6par"
+    }
+  },
+  "auth": {
+    "rideshare": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "output": {
+        "UserPoolId": "eu-north-1_FEES6hS0P",
+        "UserPoolName": "rscab",
+        "AppClientID": "7pcac91a98up4iqpbal7mgb47",
+        "AppClientIDWeb": "7pcac91a98up4iqpbal7mgb47",
+        "HostedUIDomain": "rscab"
+      },
+      "frontendAuthConfig": {
+        "socialProviders": [
+          "FACEBOOK",
+          "GOOGLE"
+        ],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": [
+            "REQUIRES_LOWERCASE",
+            "REQUIRES_UPPERCASE",
+            "REQUIRES_NUMBERS",
+            "REQUIRES_SYMBOLS"
+          ]
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "lastPushTimeStamp": "2023-11-25T18:37:03.429Z"
+    }
+  }
+}

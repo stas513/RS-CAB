@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "RSNative",
+    "slug": "RSNative",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo/logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/background/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "usesIcloudStorage": true,
+      "bundleIdentifier": "com.ridershare"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ridershare",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "location"
+      ],
+      "useNextNotificationsApi": true,
+      "config": {
+        "android:useCleartextTraffic": true,
+        "googleMaps": {
+          "apiKey": "AIzaSyCwIGYMhIBwDnpfjF8o3q8mvU-8bM8alVI"
+        }
+      }
+    },
+    "web": {},
+    "scheme": "com.ridershare",
+    "expo": {
+      "plugins": [
+        [
+          "expo-document-picker",
+          {
+            "iCloudContainerEnvironment": "Production"
+          }
+        ],
+        [
+          "expo-location",
+          {
+            "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          }
+        ]
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c935002b-06ee-4d05-9b05-f5663a97e918"
+      }
+    }
+  }
+}
