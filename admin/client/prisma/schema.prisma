@@ -1,0 +1,401 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+enum DriverStatus {
+  PENDING
+  ACTIVE
+  ONHOLD
+  SUSPEND
+}
+
+enum PassengerStatus {
+  ACTIVE
+  SUSPEND
+}
+
+enum CarStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Subcription {
+  DIAMOND
+  GOLD
+  SILVER
+  NONE
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  CANCELLED
+  REJECTED
+  COMPLETED
+}
+
+enum Payment {
+  CASH
+  CARD
+  BANK_TRANSFER
+  INVOICE
+}
+
+enum RideRequestStatus {
+  PENDING
+  CANCELLED
+  ACCEPTED
+}
+
+enum BidStatus {
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
+// AppUser can have 1 Driver
+// AppUser can have 1 passenger
+// AppUser can have many address
+model AppUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  name            String?
+  email           String @unique
+  phoneNumber     String? @unique
+  lastLogin       DateTime?  @db.Date
+  cognitoUserName String     @unique
+  passenger       Passenger? 
+  driver          Driver?
+  address         Address[]
+}
+
+// Must be belongs to 1 AppUser
+// can have many Bookings
+model Driver {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  driverRecognitionNumber String?
+  nationalInsuranceNumber String?
+  selfAssesmentTaxId      String
+  dateOfBirth             DateTime?
+  profileImage            String?
+  ratings                 Float        @default(5.0)
+  totalJobComplete        Int          @default(0)
+  bio                     String?
+  hobby                   String?
+  userInfo                AppUser?     @relation(fields: [userId], references: [id])
+  userId                  String?      @unique @db.ObjectId
+  depositePaid            Boolean      @default(false)
+  depositeAmount          Float        @default(0.00)
+  commision               Int          @default(20)
+  currentBalance          Float        @default(0.00)
+  subcription             Subcription  @default(NONE)
+  status                  DriverStatus @default(PENDING)
+  isDeleted               Boolean      @default(false)
+  totalJobs               Booking[]
+  document                Document?
+  car                     Car?
+  Bidplace                Bidplace[]
+}
+
+// Must belongs to 1 driver
+model Document {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sortCode           Int?
+  accountNumber      String?
+  bankName           String?
+  accProfDoc         String?
+  licenceDocFront    String?
+  licenceDocBack     String?
+  licenceNumber      String?
+  licenceExpiryDate  DateTime?
+  pcoBadgeDocFront   String?
+  pcoBadgeDocBack    String?
+  pcoBadgeNumber     String?
+  pcoBadgeExpiryDate DateTime?
+  pcoPaperDoc        String?
+  workPermitCode     String?
+  passportDocFront   String?
+  passportDocBack    String?
+  passportExpiryDate DateTime?
+  addressProfDoc     String?
+  driverInfo         Driver?   @relation(fields: [driverId], references: [id])
+  driverId           String    @unique @db.ObjectId
+}
+
+// Must belongs to 1 driver
+model Car {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  color       String
+  carImage    String?
+  engine      String
+  make        String
+  model       String
+  year        String
+  numberPlate String       @unique
+  status      CarStatus    @default(INACTIVE)
+  driverInfo  Driver       @relation(fields: [driverId], references: [id])
+  driverId    String       @unique @db.ObjectId
+  carDocument CarDocument?
+}
+
+// Must belongs to 1 Vehicle
+model CarDocument {
+  id                          String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+  motDoc                      String?
+  motPassDate                 DateTime?
+  insurenceDoc                String?
+  insurenceExpiryDate         DateTime?
+  pcoVehicleLicenceDoc        String?
+  pcoVehicleLicenceExpiryDate DateTime?
+  vehicleLogBookDoc           String?
+  otherDoc                    String?
+  carInfo                     Car       @relation(fields: [carId], references: [id])
+  carId                       String    @unique @db.ObjectId
+}
+
+// Must be belongs to 1 AppUser
+// can have many Bookings
+model Passenger {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profileImage  String?
+  ratings       Float           @default(5.0)
+  totalBookings Int             @default(0)
+  userId        String          @unique @db.ObjectId
+  status        PassengerStatus @default(ACTIVE)
+  isDeleted     Boolean         @default(false)
+  userInfo      AppUser         @relation(fields: [userId], references: [id])
+  bookings      Booking[]
+  Cart          Cart[]
+  Bidplace      Bidplace[]
+}
+
+// Must belongs to AppUser
+// can be one start address
+// can be one destination
+// can be one stopage
+model Address {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name               String?
+  houseNumber        String?
+  postCode           String?
+  city               String
+  notes              String?
+  // add latitude and logtitude
+  latitude           String
+  longitude          String
+  userId             String  @db.ObjectId
+  userInfo           AppUser @relation(fields: [userId], references: [id])
+  startAddress       Cart?   @relation("start")
+  destinationAddress Cart?   @relation("destination")
+  stopages           Cart?   @relation("stopage", fields: [cartId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cartId             String? @db.ObjectId
+}
+
+model Package {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  name           String  @unique
+  summary        String
+  description    String
+  sortIndex      Int     @unique
+  status         Boolean @default(true)
+  serviceFee     Float   @default(1.00)
+  pricePerMilage Float   @default(2.00)
+  drivingProMin  Float   @default(0.45)
+  waitingProMin  Float   @default(0.30)
+  vat            Float   @default(19.00)
+  coverImage     String?
+  cart           Cart[]
+}
+
+model Cart {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startFrom     Address           @relation("start", fields: [startFromId], references: [id])
+  startFromId   String            @unique @db.ObjectId
+  destination   Address           @relation("destination", fields: [destinationId], references: [id])
+  destinationId String            @unique @db.ObjectId
+  stopages      Address[]         @relation("stopage")
+  bookingDate   DateTime?
+  bookingTime   String?
+  totalDistance Float             @default(2.0)
+  totalBill     Float?
+  budget        Float?
+  status        RideRequestStatus @default(PENDING)
+  packageInfo   Package           @relation(fields: [packageId], references: [id])
+  packageId     String            @db.ObjectId
+  passengerInfo Passenger?        @relation(fields: [passengerId], references: [id])
+  passengerId   String?           @db.ObjectId
+  booking       Booking?
+  Bidplace      Bidplace[]
+}
+
+model Bidplace {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requestId   String @db.ObjectId
+  requestInfo Cart?  @relation(fields: [requestId], references: [id])
+
+  bidAmount  Float
+  driverId   String  @db.ObjectId
+  driverInfo Driver? @relation(fields: [driverId], references: [id])
+
+  passengerId   String     @db.ObjectId
+  passengerInfo Passenger? @relation(fields: [passengerId], references: [id])
+
+  status BidStatus @default(PENDING)
+}
+
+// must belong to 1 passenger
+// belongs to 1 driver (optional)
+
+model Booking {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status             BookingStatus @default(PENDING)
+  driverInfo         Driver?       @relation(fields: [driverId], references: [id])
+  driverId           String        @db.ObjectId
+  passengerId        String        @db.ObjectId
+  passengerInfo      Passenger?    @relation(fields: [passengerId], references: [id])
+  paymentType        Payment       @default(CASH)
+  paymentStatus      Boolean       @default(false)
+  paymentMethodToken String?
+  authorizationKey   String?
+  cartId             String        @unique @db.ObjectId
+  cartInfo           Cart?         @relation(fields: [cartId], references: [id])
+
+  // we can have a large booking object
+  servicePartnerName      String
+  servicePartnerEmail     String
+  servicePartnerPhone     String
+  nationalInsuranceNumber String?
+  selfAssesmentTaxId      String?
+  commission              Int? 
+  clientName              String
+  clientNumber            String?
+  clientEmail             String
+  packageName             String
+  bookingDate             DateTime
+  bookingTime             String
+  startAddress            String
+  destination             String
+  totalDistance           Float
+  totalDistanceTime       String?
+  totalWaitingTime        String?
+  totalBill               Float
+  vehicleNumberPlate      String
+  Invoice                 Invoice?
+}
+
+model Invoice {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookingInfo Booking @relation(fields: [bookingId], references: [id])
+  bookingId   String  @unique @db.ObjectId
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  ACCOUNTANT
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role           Role      @default(STAFF)
+  email          String    @unique
+  firstName      String
+  lastName       String
+  lastLogin      DateTime? @db.Date
+  otp            Int?
+  password       String
+  phoneNumber    String
+  expenceRecorde Expences?
+  incomeRecorde  Income?
+  accountRecorde Account?
+}
+
+enum PaymentOption {
+  CASH_BALANCE
+  BANK_TRANSFER
+  CARD
+  OTHER_OPTION
+}
+
+model Expences {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documentImages String[]
+  amount         Float         @default(0.00)
+  paidOption     PaymentOption @default(OTHER_OPTION)
+  paidOptionNote String
+  paidTo         String
+  date           DateTime
+  recodedBy      Admin?        @relation(fields: [adminId], references: [id])
+  adminId        String        @unique @db.ObjectId
+}
+
+model Income {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documentImages String[]
+  amount         Float         @default(0.00)
+  payOption      PaymentOption @default(OTHER_OPTION)
+  payOptionNote  String
+  recivedFrom    String
+  date           DateTime
+  recodedBy      Admin?        @relation(fields: [adminId], references: [id])
+  adminId        String        @unique @db.ObjectId
+}
+
+model Account {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cashBalance  Float  @default(0.00)
+  bankBalance  Float  @default(0.00)
+  otherBalance Float  @default(0.00)
+  updatedBy    Admin? @relation(fields: [adminId], references: [id])
+  adminId      String @unique @db.ObjectId
+}
